@@ -18,74 +18,133 @@ public class TicTacToe {
 				{' ', '|', ' ', '|', ' '}};
 		//Indicates that the user is currently the player
 		String user = "player";
-		
-		System.out.println("Which symbol would you like to use (X/O)?: ");
-		Scanner scan1 = new Scanner(System.in);
-		char playerSymbol = scan1.next().charAt(0); 
-		
-		while(playerSymbol != 'x' && playerSymbol != 'X' && playerSymbol != 'o' && playerSymbol != 'O'){
-			System.out.println("Invalid symbol selected, please pick a valid symbol (X or O): ");
-			playerSymbol = scan1.next().charAt(0);
-		}
-
-		if(playerSymbol == 'x'){
-			playerSymbol = 'X';
-		}
-		else if(playerSymbol == 'o'){
-			playerSymbol = 'O';
-		}
-		
-		//prints the game board
-		printGb(gameBoard);
-
-
-
-
+		boolean skip = false;
 
 		while(true){
-			//prompt user for input
-			System.out.println("Enter your placement (1-9):");
-			Scanner scan = new Scanner(System.in);
-			int playerPos = scan.nextInt();
-			//char yOrN;
+			System.out.println("Which symbol would you like to use (X/O)?: ");
+			Scanner scan1 = new Scanner(System.in);
+			char playerSymbol = scan1.next().charAt(0); 
 
-			//checks if valid position
-			while(playerPositions.contains(playerPos) || cpuPositions.contains(playerPos)){
-				System.out.println("This placement has been taken. Choose a valid placement.");
-				playerPos = scan.nextInt();
-			}
-			//places player's symbol on location
-			user = "player";
-			placeSymbol(gameBoard, playerPos, user, playerSymbol);
-			String result = checkWinner();
-
-			//System.out.println(result);
-			if(result != ""){
-				System.out.println(result);
-				printGb(gameBoard);
-				System.exit(0);
+			while(playerSymbol != 'x' && playerSymbol != 'X' && playerSymbol != 'o' && playerSymbol != 'O'){
+				System.out.println("Invalid symbol selected, please pick a valid symbol (X or O): ");
+				playerSymbol = scan1.next().charAt(0);
 			}
 
-			user = "cpu";
-			Random rand = new Random();
-			int cpuPos = rand.nextInt(9) + 1;
-
-			while((playerPositions.contains(cpuPos) || cpuPositions.contains(cpuPos)) && (playerPositions.size() + cpuPositions.size() < 9)){
-				cpuPos = rand.nextInt(9) + 1;
+			if(playerSymbol == 'x'){
+				playerSymbol = 'X';
+			}
+			else if(playerSymbol == 'o'){
+				playerSymbol = 'O';
 			}
 
-			if(playerPositions.size() + cpuPositions.size() < 9){
-				placeSymbol(gameBoard, cpuPos, user, playerSymbol);
-			}
+			//prints the game board
 			printGb(gameBoard);
-			result = checkWinner();
 
-			if(result != ""){
-				System.out.println(result);
-				printGb(gameBoard);
-				System.exit(0);
+			while(true){
+				skip = false;
+				//prompt user for input
+				System.out.println("Enter your placement (1-9):");
+				Scanner scan = new Scanner(System.in);
+				int playerPos = scan.nextInt();
+
+				//checks if valid position
+				while(playerPositions.contains(playerPos) || cpuPositions.contains(playerPos)){
+					System.out.println("This placement has been taken. Choose a valid placement.");
+					playerPos = scan.nextInt();
+				}
+				//places player's symbol on location
+				user = "player";
+				placeSymbol(gameBoard, playerPos, user, playerSymbol);
+				String result = checkWinner();
+
+				if(result != ""){
+					System.out.println(result);
+					printGb(gameBoard);
+
+					skip = resetGame(gameBoard);
+
+				}
+				if(skip == false){
+					user = "cpu";
+					Random rand = new Random();
+					int cpuPos = rand.nextInt(9) + 1;
+
+					while((playerPositions.contains(cpuPos) || cpuPositions.contains(cpuPos)) && (playerPositions.size() + cpuPositions.size() < 9)){
+						cpuPos = rand.nextInt(9) + 1;
+					}
+
+					if(playerPositions.size() + cpuPositions.size() < 9){
+						placeSymbol(gameBoard, cpuPos, user, playerSymbol);
+					}
+					printGb(gameBoard);
+					result = checkWinner();
+
+					if(result != ""){
+						System.out.println(result);
+						printGb(gameBoard);
+						skip = resetGame(gameBoard);
+					}
+				}
 			}
 		}
+	}
+
+	public static boolean resetGame(char[][] gb){
+		boolean correctInput = false;
+		while(correctInput == false){
+			System.out.println("Would you like to play again? (Y/N):");
+			Scanner scan2 = new Scanner(System.in);
+			char yOrN = scan2.next().charAt(0);
+			if(yOrN == 'y' || yOrN == 'Y'){
+				correctInput = true;
+
+				gb[0][0] = ' ';
+				gb[0][1] = '|';
+				gb[0][2] = ' ';
+				gb[0][3] = '|';
+				gb[0][4] = ' ';
+
+				gb[1][0] = '-';
+				gb[1][1] = '+';
+				gb[1][2] = '-';
+				gb[1][3] = '+';
+				gb[1][4] = '-';
+
+				gb[2][0] = ' ';
+				gb[2][1] = '|';
+				gb[2][2] = ' ';
+				gb[2][3] = '|';
+				gb[2][4] = ' ';
+
+				gb[3][0] = '-';
+				gb[3][1] = '+';
+				gb[3][2] = '-';
+				gb[3][3] = '+';
+				gb[3][4] = '-';
+
+				gb[4][0] = ' ';
+				gb[4][1] = '|';
+				gb[4][2] = ' ';
+				gb[4][3] = '|';
+				gb[4][4] = ' ';
+
+				printGb(gb);
+
+				playerPositions.clear();
+				cpuPositions.clear();
+				
+				return true;
+			}
+			else if(yOrN == 'n' || yOrN == 'N'){
+				correctInput = true;
+				//skip = true;
+				System.exit(0);
+			}
+			else{
+				System.out.println("You have entered the incorrect input please input either \'Y\' or \'N\' ");
+			}
+		}
+		return false;
 	}
 
 	public static void printGb(char[][] gb){
@@ -192,10 +251,10 @@ public class TicTacToe {
 			if(playerPositions.containsAll(l)){
 				return "Congratulations you have won!";
 			}
-			else if(cpuPositions.containsAll(l)){
+			if(cpuPositions.containsAll(l)){
 				return "CPU wins. You have lost.";
 			}
-			else if((playerPositions.size() + cpuPositions.size() == 9) && (playerPositions.containsAll(l) == false) && (cpuPositions.containsAll(l) == false)){
+			if((playerPositions.containsAll(l) == false) && (cpuPositions.containsAll(l) == false) && (playerPositions.size() + cpuPositions.size() == 9)){
 				return "The game has ended in a tie.";
 			}
 		}
